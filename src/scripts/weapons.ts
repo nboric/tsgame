@@ -71,6 +71,8 @@ export abstract class BaseProjectile implements Projectile{
     pos: Pos;
     disappear: boolean
     elapsed: number
+    isProjectile: boolean
+    isHit: boolean
 
     protected readonly DISAPPEAR_SECONDS = 2
 
@@ -81,11 +83,10 @@ export abstract class BaseProjectile implements Projectile{
         this.isProjectile = true
     }
 
-    hit(): void {
+    hit(): boolean {
         this.disappear = true
+        return true
     }
-
-    isProjectile: boolean;
 
     abstract render(context: CanvasRenderingContext2D): HitRegion
 

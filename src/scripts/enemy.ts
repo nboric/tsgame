@@ -15,6 +15,7 @@ class SimpleEnemy implements Enemy
     dir: Direction
     speed: number
     isEnemy: boolean
+    isHit: boolean
 
     constructor(pos: Pos) {
         this.pos = {x: pos.x, y: pos.y}
@@ -36,8 +37,8 @@ class SimpleEnemy implements Enemy
         this.pos.y += this.dir.y * this.speed
     }
 
-    hit(): void {
-
+    hit(): boolean {
+        return true
     }
 
 }

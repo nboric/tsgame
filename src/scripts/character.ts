@@ -17,6 +17,9 @@ export class Character implements Collisionable{
     weapons: Weapon[]
     bomber: Bomber
     pistol: Pistol
+    isHit: boolean
+    damaged: boolean
+    damageCooldown: number
 
     constructor(pos: Pos) {
         this.pos = pos;
@@ -25,6 +28,8 @@ export class Character implements Collisionable{
         this.weapons = [this.bomber, this.pistol]
         this.dir = {x: 0, y: 0}
         this.isCharacter = true
+        this.damaged = false
+        this.damageCooldown = 0
     }
 
     pointerPos(pos: Pos, dir: Direction, radius: number): Pos{
@@ -37,8 +42,23 @@ export class Character implements Collisionable{
     }
 
     render(context: CanvasRenderingContext2D): Array<HitRegion> {
+
+        let fill = 'rgb(255,0,0)'
+        if (this.damaged)
+        {
+            if (Math.round(this.damageCooldown / (60/2)) % 2 == 0)
+            {
+                fill = 'rgb(179,149,149)'
+            }
+            this.damageCooldown++
+            if (this.damageCooldown == 60 * 5)
+            {
+                this.damaged = false
+            }
+        }
+
         let charRegion = {
-            points: drawCircle(context, this.pos, Character.RADIUS, 'rgb(255,0,0)'),
+            points: drawCircle(context, this.pos, Character.RADIUS, fill),
             element: this
         }
 
@@ -108,7 +128,14 @@ export class Character implements Collisionable{
         this.weapons.forEach(weapon => weapon.updateAll())
     }
 
-    hit(): void {
+    hit(): boolean {
+        if (this.damaged)
+        {
+            return false
+        }
+        this.damaged = true
+        this.damageCooldown = 0
+        return true
     }
 }
 

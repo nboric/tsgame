@@ -61,31 +61,42 @@ class TheGame {
         regions = regions.concat(this.enemyManager.renderAll(context))
 
         regions.forEach(region => {
+            region.element.isHit = false
+        })
+
+        regions.forEach(region => {
+            if (region.element.isHit)
+            {
+                return
+            }
             region.points.forEach(point => {
                 if (point.x < 0 || point.x >= canvas.width ||
                     point.y < 0 || point.y > canvas.height)
                 {
                     return
                 }
-                if (collisions[point.x][point.y] != null)
+                if (collisions[point.x][point.y] != null && !collisions[point.x][point.y].isHit)
                 {
                     if ((isCharacter(region.element) && isEnemy(collisions[point.x][point.y])) ||
                         (isCharacter(collisions[point.x][point.y]) && isEnemy(region.element)))
                     {
-                        console.log("hit by enemy: " + point.x + ", " + point.y)
-                        region.element.hit()
-                        collisions[point.x][point.y].hit()
-                        this.score--
-                        // TODO: will trigger multiple time for entire region
+                        // TODO: side effect when checking
+                        if (region.element.hit() && collisions[point.x][point.y].hit()){
+                            console.log("hit by enemy: " + point.x + ", " + point.y)
+                            region.element.isHit = true
+                            collisions[point.x][point.y].isHit = true
+                            this.score--
+                        }
                     }
                     else if ((isProjectile(region.element) && isEnemy(collisions[point.x][point.y])) ||
                         (isProjectile(collisions[point.x][point.y]) && isEnemy(region.element)))
                     {
-                        console.log("enemy hit: " + point.x + ", " + point.y)
-                        region.element.hit()
-                        collisions[point.x][point.y].hit()
-                        this.score++
-                        // TODO: will trigger multiple time for entire region
+                        if (region.element.hit() && collisions[point.x][point.y].hit()){
+                            console.log("enemy hit: " + point.x + ", " + point.y)
+                            region.element.isHit = true
+                            collisions[point.x][point.y].isHit = true
+                            this.score++
+                        }
                     }
                 }
                 collisions[point.x][point.y] = region.element
