@@ -1,8 +1,12 @@
-import {Direction, GameElement, Pos, HitRegion} from "./types.js";
+import {Direction, GameElement, Pos, HitRegion, Collisionable} from "./types.js";
 import {drawCircle} from "./util.js";
 
 export interface Enemy extends GameElement{
+    isEnemy: boolean
+}
 
+export function isEnemy(el: Collisionable): el is Enemy{
+    return (el as Enemy).isEnemy !== undefined
 }
 
 class SimpleEnemy implements Enemy
@@ -10,6 +14,7 @@ class SimpleEnemy implements Enemy
     pos: Pos;
     dir: Direction
     speed: number
+    isEnemy: boolean
 
     constructor(pos: Pos) {
         this.pos = {x: pos.x, y: pos.y}
@@ -17,6 +22,8 @@ class SimpleEnemy implements Enemy
         this.dir = {x: -1 + Math.random() * 2, y: -1 + Math.random() * 2}
 
         this.speed = 1 + Math.random() * 2
+
+        this.isEnemy = true
     }
 
     render(context: CanvasRenderingContext2D): HitRegion {
@@ -27,6 +34,10 @@ class SimpleEnemy implements Enemy
 
         this.pos.x += this.dir.x * this.speed
         this.pos.y += this.dir.y * this.speed
+    }
+
+    hit(): void {
+
     }
 
 }

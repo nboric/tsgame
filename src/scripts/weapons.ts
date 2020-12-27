@@ -1,4 +1,4 @@
-import {Direction, GameElement, Pos, HitRegion} from "./types";
+import {Direction, GameElement, Pos, HitRegion, Collisionable} from "./types";
 
 export interface Weapon
 {
@@ -10,7 +10,12 @@ export interface Weapon
 
 export interface Projectile extends GameElement
 {
+    isProjectile: boolean
     shouldDisappear(): boolean
+}
+
+export function isProjectile(el: Collisionable): el is Projectile{
+    return (el as Projectile).isProjectile !== undefined
 }
 
 export abstract class BaseWeapon implements Weapon
@@ -73,7 +78,14 @@ export abstract class BaseProjectile implements Projectile{
         this.pos = {x: pos.x, y: pos.y}
         this.disappear = false
         this.elapsed = 0
+        this.isProjectile = true
     }
+
+    hit(): void {
+        this.disappear = true
+    }
+
+    isProjectile: boolean;
 
     abstract render(context: CanvasRenderingContext2D): HitRegion
 

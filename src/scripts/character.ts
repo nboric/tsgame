@@ -11,6 +11,7 @@ export class Character implements Collisionable{
     static readonly MOVE_STEP = 2
     static readonly RADIUS = 20
 
+    isCharacter: boolean
     pos: Pos;
     dir: Direction
     weapons: Weapon[]
@@ -23,6 +24,7 @@ export class Character implements Collisionable{
         this.pistol = new Pistol()
         this.weapons = [this.bomber, this.pistol]
         this.dir = {x: 0, y: 0}
+        this.isCharacter = true
     }
 
     pointerPos(pos: Pos, dir: Direction, radius: number): Pos{
@@ -105,5 +107,11 @@ export class Character implements Collisionable{
 
         this.weapons.forEach(weapon => weapon.updateAll())
     }
+
+    hit(): void {
+    }
 }
 
+export function isCharacter(el: Collisionable): el is Character{
+    return (el as Character).isCharacter !== undefined
+}

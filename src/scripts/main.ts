@@ -1,8 +1,8 @@
-import {Character} from "./character..js";
+import {Character, isCharacter} from "./character.js";
 import {KeyController} from "./keys.js";
-import {Enemy, EnemyManager} from "./enemy.js";
+import {EnemyManager, isEnemy} from "./enemy.js";
 import {Collisionable, HitRegion} from "./types";
-import {Projectile} from "./weapons";
+import {isProjectile} from "./weapons.js";
 
 class TheGame {
     private readonly context: CanvasRenderingContext2D;
@@ -12,6 +12,8 @@ class TheGame {
     private keyController : KeyController
 
     private enemyManager: EnemyManager
+
+    private score: number
 
     constructor() {
         const canvas: HTMLCanvasElement = document.createElement('canvas')
@@ -37,6 +39,8 @@ class TheGame {
 
         this.enemyManager = new EnemyManager(context)
 
+        this.score = 0
+
     }
 
     renderAll(context: CanvasRenderingContext2D): void {
@@ -58,24 +62,38 @@ class TheGame {
 
         regions.forEach(region => {
             region.points.forEach(point => {
+                if (point.x < 0 || point.x >= canvas.width ||
+                    point.y < 0 || point.y > canvas.height)
+                {
+                    return
+                }
                 if (collisions[point.x][point.y] != null)
                 {
-                    if (region.element as Character)
+                    if ((isCharacter(region.element) && isEnemy(collisions[point.x][point.y])) ||
+                        (isCharacter(collisions[point.x][point.y]) && isEnemy(region.element)))
                     {
-                        if (collisions[point.x][point.y] as Enemy)
-                        {
-                            console.log("hit by enemy: " + point.x + ", " + point.y)
-                        }
+                        console.log("hit by enemy: " + point.x + ", " + point.y)
+                        region.element.hit()
+                        collisions[point.x][point.y].hit()
+                        this.score--
+                        // TODO: will trigger multiple time for entire region
                     }
-                    if (region.element as Enemy) {
-                        if (collisions[point.x][point.y] as Projectile) {
-                            console.log("enemy hit: " + point.x + ", " + point.y)
-                        }
+                    else if ((isProjectile(region.element) && isEnemy(collisions[point.x][point.y])) ||
+                        (isProjectile(collisions[point.x][point.y]) && isEnemy(region.element)))
+                    {
+                        console.log("enemy hit: " + point.x + ", " + point.y)
+                        region.element.hit()
+                        collisions[point.x][point.y].hit()
+                        this.score++
+                        // TODO: will trigger multiple time for entire region
                     }
                 }
                 collisions[point.x][point.y] = region.element
             })
         })
+
+        context.font = "30px Arial"
+        context.fillText(`Score: ${this.score}`, 0, 30)
     }
 
     updateAll()

@@ -14,7 +14,7 @@ export interface HitRegion{
 }
 
 export interface Collisionable{
-
+    hit(): void
 }
 
 export interface GameElement extends Collisionable{
