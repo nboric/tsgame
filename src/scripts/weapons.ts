@@ -1,4 +1,4 @@
-import {Direction, GameElement, Pos, HitRegion, Collisionable} from "./types";
+import {Direction, ElementType, GameElement, HitRegion, Pos} from "./types.js";
 
 export interface Weapon
 {
@@ -10,12 +10,7 @@ export interface Weapon
 
 export interface Projectile extends GameElement
 {
-    isProjectile: boolean
     shouldDisappear(): boolean
-}
-
-export function isProjectile(el: Collisionable): el is Projectile{
-    return (el as Projectile).isProjectile !== undefined
 }
 
 export abstract class BaseWeapon implements Weapon
@@ -71,8 +66,7 @@ export abstract class BaseProjectile implements Projectile{
     pos: Pos;
     disappear: boolean
     elapsed: number
-    isProjectile: boolean
-    isHit: boolean
+    type: ElementType
 
     protected readonly DISAPPEAR_SECONDS = 2
 
@@ -80,10 +74,10 @@ export abstract class BaseProjectile implements Projectile{
         this.pos = {x: pos.x, y: pos.y}
         this.disappear = false
         this.elapsed = 0
-        this.isProjectile = true
+        this.type = ElementType.PROJECTILE
     }
 
-    hit(): boolean {
+    hit(hitBy: ElementType): boolean {
         this.disappear = true
         return true
     }
@@ -100,6 +94,10 @@ export abstract class BaseProjectile implements Projectile{
         {
             this.disappear = true
         }
+    }
+
+    shouldBeHit(hitBy: ElementType): boolean {
+        return (hitBy == ElementType.ENEMY && !this.shouldDisappear())
     }
 
 }

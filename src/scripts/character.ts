@@ -2,24 +2,21 @@ import {IKeyMap} from "./keys.js";
 import {Weapon} from "./weapons.js";
 import {Bomber} from "./bomb.js";
 import {Pistol} from "./pistol.js";
-import {HitRegion, Direction, Pos, Collisionable} from "./types.js";
+import {Collisionable, Direction, ElementType, HitRegion, Pos} from "./types.js";
 import {drawCircle} from "./util.js";
-
-// TODO:
 
 export class Character implements Collisionable{
     static readonly MOVE_STEP = 2
     static readonly RADIUS = 20
 
-    isCharacter: boolean
     pos: Pos;
     dir: Direction
     weapons: Weapon[]
     bomber: Bomber
     pistol: Pistol
-    isHit: boolean
     damaged: boolean
     damageCooldown: number
+    type: ElementType
 
     constructor(pos: Pos) {
         this.pos = pos;
@@ -27,9 +24,9 @@ export class Character implements Collisionable{
         this.pistol = new Pistol()
         this.weapons = [this.bomber, this.pistol]
         this.dir = {x: 0, y: 0}
-        this.isCharacter = true
         this.damaged = false
         this.damageCooldown = 0
+        this.type = ElementType.CHARACTER
     }
 
     pointerPos(pos: Pos, dir: Direction, radius: number): Pos{
@@ -128,17 +125,12 @@ export class Character implements Collisionable{
         this.weapons.forEach(weapon => weapon.updateAll())
     }
 
-    hit(): boolean {
-        if (this.damaged)
-        {
-            return false
-        }
+    hit(hitBy: ElementType) {
         this.damaged = true
         this.damageCooldown = 0
-        return true
     }
-}
 
-export function isCharacter(el: Collisionable): el is Character{
-    return (el as Character).isCharacter !== undefined
+    shouldBeHit(hitBy: ElementType): boolean {
+        return hitBy == ElementType.ENEMY && !this.damaged
+    }
 }

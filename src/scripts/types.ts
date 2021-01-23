@@ -14,8 +14,15 @@ export interface HitRegion{
 }
 
 export interface Collisionable{
-    hit(): boolean
-    isHit: boolean
+    shouldBeHit(hitBy: ElementType): boolean
+    hit(hitBy: ElementType)
+    type: ElementType
+}
+
+export enum ElementType {
+    CHARACTER,
+    ENEMY,
+    PROJECTILE
 }
 
 export interface GameElement extends Collisionable{

@@ -1,5 +1,5 @@
 import {BaseProjectile, BaseWeapon, Projectile} from "./weapons.js";
-import {Direction, Pos, HitRegion} from "./types";
+import {Direction, Pos, HitRegion} from "./types.js";
 import {drawCircle} from "./util.js";
 
 class Bomb extends BaseProjectile

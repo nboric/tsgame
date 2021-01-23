@@ -1,8 +1,7 @@
-import {Character, isCharacter} from "./character.js";
+import {Character} from "./character.js";
 import {KeyController} from "./keys.js";
-import {EnemyManager, isEnemy} from "./enemy.js";
-import {Collisionable, HitRegion} from "./types";
-import {isProjectile} from "./weapons.js";
+import {EnemyManager} from "./enemy.js";
+import {Collisionable, HitRegion} from "./types.js";
 
 class TheGame {
     private readonly context: CanvasRenderingContext2D;
@@ -60,12 +59,10 @@ class TheGame {
 
         regions = regions.concat(this.enemyManager.renderAll(context))
 
-        regions.forEach(region => {
-            region.element.isHit = false
-        })
+        let hitThisFrame = new Set<Collisionable>()
 
         regions.forEach(region => {
-            if (region.element.isHit)
+            if (hitThisFrame.has(region.element))
             {
                 return
             }
@@ -75,33 +72,25 @@ class TheGame {
                 {
                     return
                 }
-                if (collisions[point.x][point.y] != null && !collisions[point.x][point.y].isHit)
+                let collisionElement = collisions[point.x][point.y]
+                if (collisionElement != null && !hitThisFrame.has(collisionElement))
                 {
-                    if ((isCharacter(region.element) && isEnemy(collisions[point.x][point.y])) ||
-                        (isCharacter(collisions[point.x][point.y]) && isEnemy(region.element)))
+                    if (region.element.shouldBeHit(collisionElement.type))
                     {
-                        // TODO: side effect when checking
-                        if (region.element.hit() && collisions[point.x][point.y].hit()){
-                            console.log("hit by enemy: " + point.x + ", " + point.y)
-                            region.element.isHit = true
-                            collisions[point.x][point.y].isHit = true
-                            this.score--
-                        }
+                        region.element.hit(collisionElement.type)
+                        hitThisFrame.add(region.element)
                     }
-                    else if ((isProjectile(region.element) && isEnemy(collisions[point.x][point.y])) ||
-                        (isProjectile(collisions[point.x][point.y]) && isEnemy(region.element)))
+                    if (collisionElement.shouldBeHit(region.element.type))
                     {
-                        if (region.element.hit() && collisions[point.x][point.y].hit()){
-                            console.log("enemy hit: " + point.x + ", " + point.y)
-                            region.element.isHit = true
-                            collisions[point.x][point.y].isHit = true
-                            this.score++
-                        }
+                        collisionElement.hit(region.element.type)
+                        hitThisFrame.add(collisionElement)
                     }
                 }
                 collisions[point.x][point.y] = region.element
             })
         })
+
+        // out of bounds
 
         context.font = "30px Arial"
         context.fillText(`Score: ${this.score}`, 0, 30)

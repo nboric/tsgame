@@ -1,15 +1,15 @@
-import {Direction, GameElement, Pos, HitRegion, Collisionable} from "./types.js";
+import {Direction, ElementType, GameElement, HitRegion, Pos} from "./types.js";
 import {drawCircle} from "./util.js";
 
 enum Status {
     NORMAL,
     HIT,
     DYING,
-    DEAD
+    DEAD,
+    OUT_OF_BOUNDS
 }
 
 export interface Enemy extends GameElement{
-    isEnemy: boolean
     hitPoints: number
     status: Status
     elapsed: number
@@ -17,20 +17,18 @@ export interface Enemy extends GameElement{
     shouldDisappear(): boolean
 }
 
-export function isEnemy(el: Collisionable): el is Enemy{
-    return (el as Enemy).isEnemy !== undefined
-}
-
 class SimpleEnemy implements Enemy
 {
+    protected readonly HIT_COOLDOWN_SECONDS: number = 1
+    protected readonly DEAD_COOLDOWN_SECONDS: number = 2
+
     pos: Pos;
     dir: Direction
     speed: number
-    isEnemy: boolean
-    isHit: boolean
     hitPoints: number
     status: Status
     elapsed: number
+    type: ElementType
 
     constructor(pos: Pos) {
         this.pos = {x: pos.x, y: pos.y}
@@ -39,11 +37,10 @@ class SimpleEnemy implements Enemy
 
         this.speed = 1 + Math.random() * 1.5
 
-        this.isEnemy = true
-
         this.hitPoints = 3
         this.status = Status.NORMAL
         this.elapsed = 0
+        this.type = ElementType.ENEMY
     }
 
     render(context: CanvasRenderingContext2D): HitRegion {
@@ -58,6 +55,14 @@ class SimpleEnemy implements Enemy
             default:
 
         }
+
+        // TODO: don't like changing status in render
+        if (this.pos.x < 0 || this.pos.x > context.canvas.width
+            || this.pos.y < 0 || this.pos.y > context.canvas.height)
+        {
+            this.status = Status.OUT_OF_BOUNDS
+        }
+
         return {points: drawCircle(context, this.pos, 10, fill), element: this}
     }
 
@@ -67,13 +72,13 @@ class SimpleEnemy implements Enemy
         switch (this.status)
         {
             case Status.DYING:
-                if (this.elapsed > 60 * 2)
+                if (this.elapsed > 60 * this.DEAD_COOLDOWN_SECONDS)
                 {
                     this.status = Status.DEAD
                 }
                 break
             case Status.HIT:
-                if (this.elapsed > 60 * 1)
+                if (this.elapsed > 60 * this.HIT_COOLDOWN_SECONDS)
                 {
                     this.status = Status.NORMAL
                 }
@@ -85,23 +90,21 @@ class SimpleEnemy implements Enemy
         this.pos.y += this.dir.y * this.speed
     }
 
-    hit(): boolean {
-        if (~this.isHit) {
-            if (this.status == Status.NORMAL)
-            {
-                this.elapsed = 0
-                this.status = Status.HIT
-                this.hitPoints--
-                if (this.hitPoints == 0){
-                    this.status = Status.DYING
-                }
-            }
+    hit(hitBy: ElementType) {
+        this.elapsed = 0
+        this.status = Status.HIT
+        this.hitPoints--
+        if (this.hitPoints == 0){
+            this.status = Status.DYING
         }
-        return true
     }
 
     shouldDisappear(): boolean {
-        return this.status == Status.DEAD
+        return this.status == Status.DEAD || this.status == Status.OUT_OF_BOUNDS
+    }
+
+    shouldBeHit(hitBy: ElementType): boolean {
+        return (hitBy == ElementType.PROJECTILE && this.status == Status.NORMAL)
     }
 
 }
@@ -109,15 +112,23 @@ class SimpleEnemy implements Enemy
 export class EnemyManager
 {
     enemies: SimpleEnemy[]
+    context: CanvasRenderingContext2D
 
     constructor(context: CanvasRenderingContext2D) {
         this.enemies = []
+
+        // TODO: don't like to keep reference to context only to create new enemies in same position
+        this.context = context
+        this.enemies.push(this.newSimpleEnemy(context))
+    }
+
+    newSimpleEnemy(context: CanvasRenderingContext2D): SimpleEnemy {
         let pos = {
             x: context.canvas.width / 3,
             y: context.canvas.height / 3
         }
 
-        this.enemies.push(new SimpleEnemy(pos))
+        return new SimpleEnemy(pos)
     }
 
     renderAll(context: CanvasRenderingContext2D): Array<HitRegion> {
@@ -131,5 +142,11 @@ export class EnemyManager
     updateAll(): void {
         this.enemies.forEach(enemy => enemy.update())
         this.enemies = this.enemies.filter(e => !e.shouldDisappear())
+
+        if (this.enemies.length == 0)
+        {
+            this.enemies.push(this.newSimpleEnemy(this.context))
+        }
+
     }
 }
