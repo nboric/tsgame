@@ -111,6 +111,8 @@ class SimpleEnemy implements Enemy
 
 export class EnemyManager
 {
+    protected readonly MIN_ENEMIES: number = 2
+
     enemies: SimpleEnemy[]
     context: CanvasRenderingContext2D
 
@@ -143,7 +145,7 @@ export class EnemyManager
         this.enemies.forEach(enemy => enemy.update())
         this.enemies = this.enemies.filter(e => !e.shouldDisappear())
 
-        if (this.enemies.length == 0)
+        if (this.enemies.length < this.MIN_ENEMIES)
         {
             this.enemies.push(this.newSimpleEnemy(this.context))
         }
