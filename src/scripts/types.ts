@@ -1,19 +1,19 @@
-export interface Pos{
+export interface Pos {
     x: number
     y: number
 }
 
-export interface Direction{
+export interface Direction {
     x: number
     y: number
 }
 
-export interface HitRegion{
+export interface HitRegion {
     points: Array<Pos>
     element: Collisionable
 }
 
-export interface Collisionable{
+export interface Collisionable {
     shouldBeHit(hitBy: ElementType): boolean
     hit(hitBy: ElementType)
     type: ElementType
@@ -25,7 +25,7 @@ export enum ElementType {
     PROJECTILE
 }
 
-export interface GameElement extends Collisionable{
+export interface GameElement extends Collisionable {
     pos: Pos
 
     render(context: CanvasRenderingContext2D): HitRegion

@@ -1,16 +1,16 @@
-import {BaseProjectile, BaseWeapon, Projectile} from "./weapons.js";
-import {Direction, Pos, HitRegion} from "./types.js";
-import {drawCircle} from "./util.js";
+import {BaseProjectile, BaseWeapon, Projectile} from "./weapons.js"
+import {Direction, Pos, HitRegion} from "./types.js"
+import {drawCircle} from "./util.js"
 
 class Bomb extends BaseProjectile
 {
     static readonly EXPLODE_SECONDS = 1
     protected readonly DISAPPEAR_SECONDS = 2
 
-    pos: Pos;
-    exploded: boolean;
+    pos: Pos
+    exploded: boolean
     elapsed: number
-    disappear: boolean;
+    disappear: boolean
 
     constructor(pos: Pos, dir: Direction) {
         super(pos, dir)
@@ -27,7 +27,7 @@ class Bomb extends BaseProjectile
         {
             fillStyle = 'rgb(0,255,0)'
         }
-        return {points: drawCircle(context, this.pos, 5, fillStyle), element: this}
+        return { points: drawCircle(context, this.pos, 5, fillStyle), element: this }
     }
 
     update(): void {

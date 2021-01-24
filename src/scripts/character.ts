@@ -1,9 +1,9 @@
-import {IKeyMap} from "./keys.js";
-import {Weapon} from "./weapons.js";
-import {Bomber} from "./bomb.js";
-import {Pistol} from "./pistol.js";
-import {Collisionable, Direction, ElementType, HitRegion, Pos} from "./types.js";
-import {drawCircle} from "./util.js";
+import {IKeyMap} from "./keys.js"
+import {Weapon} from "./weapons.js"
+import {Bomber} from "./bomb.js"
+import {Pistol} from "./pistol.js"
+import {Collisionable, Direction, ElementType, HitRegion, Pos} from "./types.js"
+import {drawCircle} from "./util.js"
 
 enum Status {
     NORMAL,
@@ -13,11 +13,11 @@ enum Status {
     OUT_OF_BOUNDS
 }
 
-export class Character implements Collisionable{
+export class Character implements Collisionable {
     static readonly MOVE_STEP = 2
     static readonly RADIUS = 20
 
-    pos: Pos;
+    pos: Pos
     dir: Direction
     weapons: Weapon[]
     bomber: Bomber
@@ -28,7 +28,7 @@ export class Character implements Collisionable{
     status: Status
 
     constructor(pos: Pos) {
-        this.pos = pos;
+        this.pos = pos
         this.bomber = new Bomber()
         this.pistol = new Pistol()
         this.weapons = [this.bomber, this.pistol]
@@ -39,13 +39,13 @@ export class Character implements Collisionable{
         this.status = Status.NORMAL
     }
 
-    pointerPos(pos: Pos, dir: Direction, radius: number): Pos{
+    pointerPos(pos: Pos, dir: Direction, radius: number): Pos {
         let l = radius
         if (dir.x != 0 && dir.y != 0)
         {
             l = radius * Math.sin(Math.PI/4)
         }
-        return {x: pos.x + dir.x * l, y: pos.y + dir.y * l}
+        return { x: pos.x + dir.x * l, y: pos.y + dir.y * l }
     }
 
     render(context: CanvasRenderingContext2D): Array<HitRegion> {
@@ -103,7 +103,7 @@ export class Character implements Collisionable{
             return
         }
 
-        this.dir = {x: 0, y: 0}
+        this.dir = { x: 0, y: 0 }
         if (keyMap['KeyS'])
         {
             this.pos.y += Character.MOVE_STEP
@@ -145,7 +145,7 @@ export class Character implements Collisionable{
             }
         }
 
-        this.elapsed++;
+        this.elapsed++
         switch (this.status)
         {
             case Status.DYING:
@@ -170,7 +170,7 @@ export class Character implements Collisionable{
         this.status = Status.HIT
         this.elapsed = 0
         this.hitPoints--
-        if (this.hitPoints == 0){
+        if (this.hitPoints == 0) {
             this.status = Status.DYING
         }
 

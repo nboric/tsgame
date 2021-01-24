@@ -1,4 +1,4 @@
-import {Direction, ElementType, GameElement, HitRegion, Pos} from "./types.js";
+import {Direction, ElementType, GameElement, HitRegion, Pos} from "./types.js"
 
 export interface Weapon
 {
@@ -46,7 +46,7 @@ export abstract class BaseWeapon implements Weapon
         {
             this.coolDown++
         }
-        this.projectiles.forEach(proj => {proj.update()})
+        this.projectiles.forEach(proj => { proj.update() })
         this.projectiles = this.projectiles.filter(proj => !proj.shouldDisappear())
     }
 
@@ -62,8 +62,8 @@ export abstract class BaseWeapon implements Weapon
 
 }
 
-export abstract class BaseProjectile implements Projectile{
-    pos: Pos;
+export abstract class BaseProjectile implements Projectile {
+    pos: Pos
     disappear: boolean
     elapsed: number
     type: ElementType
@@ -71,7 +71,7 @@ export abstract class BaseProjectile implements Projectile{
     protected readonly DISAPPEAR_SECONDS = 2
 
     protected constructor(pos: Pos, dir: Direction) {
-        this.pos = {x: pos.x, y: pos.y}
+        this.pos = { x: pos.x, y: pos.y }
         this.disappear = false
         this.elapsed = 0
         this.type = ElementType.PROJECTILE
@@ -85,11 +85,11 @@ export abstract class BaseProjectile implements Projectile{
     abstract render(context: CanvasRenderingContext2D): HitRegion
 
     shouldDisappear(): boolean {
-        return this.disappear;
+        return this.disappear
     }
 
-    update(): void{
-        this.elapsed++;
+    update(): void {
+        this.elapsed++
         if (this.elapsed > 60 * this.DISAPPEAR_SECONDS)
         {
             this.disappear = true

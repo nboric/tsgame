@@ -1,4 +1,4 @@
-import {Pos} from "./types.js";
+import {Pos} from "./types.js"
 
 export function drawCircle(context: CanvasRenderingContext2D, center: Pos, radius: number, fillStyle: string): Array<Pos>
 {
@@ -12,7 +12,7 @@ export function drawCircle(context: CanvasRenderingContext2D, center: Pos, radiu
     return circleRegion(center, radius)
 }
 
-export function circleRegion(center: Pos, radius: number): Array<Pos>{
+export function circleRegion(center: Pos, radius: number): Array<Pos> {
     let points: Array<Pos> = []
     for (let x = Math.floor(center.x - radius); x < Math.ceil(center.x + radius); x++)
     {
@@ -20,7 +20,7 @@ export function circleRegion(center: Pos, radius: number): Array<Pos>{
         {
             if (Math.pow(x - center.x, 2) + Math.pow(y - center.y, 2) < Math.pow(radius, 2))
             {
-                points.push({x: x, y: y})
+                points.push({ x: x, y: y })
             }
         }
     }

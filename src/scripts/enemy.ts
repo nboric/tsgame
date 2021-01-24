@@ -1,5 +1,5 @@
-import {Direction, ElementType, GameElement, HitRegion, Pos} from "./types.js";
-import {drawCircle} from "./util.js";
+import {Direction, ElementType, GameElement, HitRegion, Pos} from "./types.js"
+import {drawCircle} from "./util.js"
 
 enum Status {
     NORMAL,
@@ -9,7 +9,7 @@ enum Status {
     OUT_OF_BOUNDS
 }
 
-export interface Enemy extends GameElement{
+export interface Enemy extends GameElement {
     hitPoints: number
     status: Status
     elapsed: number
@@ -22,7 +22,7 @@ class SimpleEnemy implements Enemy
     protected readonly HIT_COOLDOWN_SECONDS: number = 1
     protected readonly DEAD_COOLDOWN_SECONDS: number = 2
 
-    pos: Pos;
+    pos: Pos
     dir: Direction
     speed: number
     hitPoints: number
@@ -31,9 +31,9 @@ class SimpleEnemy implements Enemy
     type: ElementType
 
     constructor(pos: Pos) {
-        this.pos = {x: pos.x, y: pos.y}
+        this.pos = { x: pos.x, y: pos.y }
 
-        this.dir = {x: -1 + Math.random() * 2, y: -1 + Math.random() * 2}
+        this.dir = { x: -1 + Math.random() * 2, y: -1 + Math.random() * 2 }
 
         this.speed = 1 + Math.random() * 1.5
 
@@ -45,7 +45,7 @@ class SimpleEnemy implements Enemy
 
     render(context: CanvasRenderingContext2D): HitRegion {
         let fill = 'rgb(0,255,255)'
-        switch (this.status){
+        switch (this.status) {
             case Status.HIT:
                 fill = 'rgb(90,174,174)'
                 break
@@ -63,7 +63,7 @@ class SimpleEnemy implements Enemy
             this.status = Status.OUT_OF_BOUNDS
         }
 
-        let hitRegion = {points: drawCircle(context, this.pos, 10, fill), element: this}
+        let hitRegion = { points: drawCircle(context, this.pos, 10, fill), element: this }
 
         context.font = "10px Arial"
         context.fillStyle = 'rgb(0,0,0)'
@@ -74,7 +74,7 @@ class SimpleEnemy implements Enemy
 
     update(): void {
 
-        this.elapsed++;
+        this.elapsed++
         switch (this.status)
         {
             case Status.DYING:
@@ -100,7 +100,7 @@ class SimpleEnemy implements Enemy
         this.elapsed = 0
         this.status = Status.HIT
         this.hitPoints--
-        if (this.hitPoints == 0){
+        if (this.hitPoints == 0) {
             this.status = Status.DYING
         }
     }

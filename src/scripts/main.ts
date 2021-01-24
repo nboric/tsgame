@@ -1,10 +1,10 @@
-import {Character} from "./character.js";
-import {KeyController} from "./keys.js";
-import {EnemyManager} from "./enemy.js";
-import {Collisionable, HitRegion} from "./types.js";
+import {Character} from "./character.js"
+import {KeyController} from "./keys.js"
+import {EnemyManager} from "./enemy.js"
+import {Collisionable, HitRegion} from "./types.js"
 
 class TheGame {
-    private readonly context: CanvasRenderingContext2D;
+    private readonly context: CanvasRenderingContext2D
 
     private mainChar: Character
 
@@ -25,9 +25,9 @@ class TheGame {
 
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
-        root.appendChild(canvas);
+        root.appendChild(canvas)
 
-        this.context = context;
+        this.context = context
 
         this.mainChar = new Character({
             x: this.context.canvas.width / 2,
@@ -117,6 +117,6 @@ class TheGame {
     }
 }
 
-new TheGame().start();
+new TheGame().start()
 
 

@@ -1,4 +1,4 @@
-export class KeyController{
+export class KeyController {
 
     keyMap: IKeyMap = {}
 
