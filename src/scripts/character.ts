@@ -5,6 +5,14 @@ import {Pistol} from "./pistol.js";
 import {Collisionable, Direction, ElementType, HitRegion, Pos} from "./types.js";
 import {drawCircle} from "./util.js";
 
+enum Status {
+    NORMAL,
+    HIT,
+    DYING,
+    DEAD,
+    OUT_OF_BOUNDS
+}
+
 export class Character implements Collisionable{
     static readonly MOVE_STEP = 2
     static readonly RADIUS = 20
@@ -14,9 +22,10 @@ export class Character implements Collisionable{
     weapons: Weapon[]
     bomber: Bomber
     pistol: Pistol
-    damaged: boolean
-    damageCooldown: number
+    elapsed: number
     type: ElementType
+    hitPoints: number
+    status: Status
 
     constructor(pos: Pos) {
         this.pos = pos;
@@ -24,9 +33,10 @@ export class Character implements Collisionable{
         this.pistol = new Pistol()
         this.weapons = [this.bomber, this.pistol]
         this.dir = {x: 0, y: 0}
-        this.damaged = false
-        this.damageCooldown = 0
+        this.elapsed = 0
         this.type = ElementType.CHARACTER
+        this.hitPoints = 5
+        this.status = Status.NORMAL
     }
 
     pointerPos(pos: Pos, dir: Direction, radius: number): Pos{
@@ -41,17 +51,20 @@ export class Character implements Collisionable{
     render(context: CanvasRenderingContext2D): Array<HitRegion> {
 
         let fill = 'rgb(255,0,0)'
-        if (this.damaged)
+        switch(this.status)
         {
-            if (Math.round(this.damageCooldown / (60/2)) % 2 == 0)
-            {
-                fill = 'rgb(179,149,149)'
-            }
-            this.damageCooldown++
-            if (this.damageCooldown == 60 * 5)
-            {
-                this.damaged = false
-            }
+            case Status.HIT:
+                if (Math.round(this.elapsed / (60/2)) % 2 == 0)
+                {
+                    fill = 'rgb(179,149,149)'
+                }
+                break
+            case Status.DYING:
+                fill = 'rgb(33,6,6)'
+                break
+            case Status.DEAD:
+                fill = 'rgb(159,146,146)'
+                break
         }
 
         let charRegion = {
@@ -76,10 +89,20 @@ export class Character implements Collisionable{
             regions = regions.concat(weapon.renderAll(context))
         })
 
+        context.font = "15px Arial"
+        context.fillStyle = 'rgb(0,0,0)'
+        context.fillText(`${this.hitPoints}`, this.pos.x-5, this.pos.y+5)
+
         return regions
     }
 
     update(keyMap: IKeyMap): void {
+
+        if (this.status == Status.DEAD)
+        {
+            return
+        }
+
         this.dir = {x: 0, y: 0}
         if (keyMap['KeyS'])
         {
@@ -122,15 +145,38 @@ export class Character implements Collisionable{
             }
         }
 
+        this.elapsed++;
+        switch (this.status)
+        {
+            case Status.DYING:
+                if (this.elapsed > 60 * 3)
+                {
+                    this.status = Status.DEAD
+                }
+                break
+            case Status.HIT:
+                if (this.elapsed == 60 * 5)
+                {
+                    this.status = Status.NORMAL
+                }
+                break
+            default:
+        }
+
         this.weapons.forEach(weapon => weapon.updateAll())
     }
 
     hit(hitBy: ElementType) {
-        this.damaged = true
-        this.damageCooldown = 0
+        this.status = Status.HIT
+        this.elapsed = 0
+        this.hitPoints--
+        if (this.hitPoints == 0){
+            this.status = Status.DYING
+        }
+
     }
 
     shouldBeHit(hitBy: ElementType): boolean {
-        return hitBy == ElementType.ENEMY && !this.damaged
+        return hitBy == ElementType.ENEMY && this.status == Status.NORMAL
     }
 }

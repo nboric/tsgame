@@ -37,7 +37,7 @@ class SimpleEnemy implements Enemy
 
         this.speed = 1 + Math.random() * 1.5
 
-        this.hitPoints = 3
+        this.hitPoints = 2
         this.status = Status.NORMAL
         this.elapsed = 0
         this.type = ElementType.ENEMY
@@ -50,7 +50,7 @@ class SimpleEnemy implements Enemy
                 fill = 'rgb(90,174,174)'
                 break
             case Status.DYING:
-                fill = 'rgb(0,34,34)'
+                fill = 'rgb(132,136,136)'
                 break
             default:
 
@@ -63,7 +63,13 @@ class SimpleEnemy implements Enemy
             this.status = Status.OUT_OF_BOUNDS
         }
 
-        return {points: drawCircle(context, this.pos, 10, fill), element: this}
+        let hitRegion = {points: drawCircle(context, this.pos, 10, fill), element: this}
+
+        context.font = "10px Arial"
+        context.fillStyle = 'rgb(0,0,0)'
+        context.fillText(`${this.hitPoints}`, this.pos.x-3, this.pos.y+4)
+
+        return hitRegion
     }
 
     update(): void {
@@ -107,11 +113,15 @@ class SimpleEnemy implements Enemy
         return (hitBy == ElementType.PROJECTILE && this.status == Status.NORMAL)
     }
 
+    isDead(): boolean {
+        return this.status == Status.DEAD
+    }
+
 }
 
 export class EnemyManager
 {
-    protected readonly MIN_ENEMIES: number = 2
+    protected readonly MIN_ENEMIES: number = 20
 
     enemies: SimpleEnemy[]
     context: CanvasRenderingContext2D
@@ -126,8 +136,8 @@ export class EnemyManager
 
     newSimpleEnemy(context: CanvasRenderingContext2D): SimpleEnemy {
         let pos = {
-            x: context.canvas.width / 3,
-            y: context.canvas.height / 3
+            x: Math.round(context.canvas.width * Math.random()),
+            y: Math.round(context.canvas.height * Math.random())
         }
 
         return new SimpleEnemy(pos)
@@ -141,8 +151,10 @@ export class EnemyManager
         return regions
     }
 
-    updateAll(): void {
+    updateAll(): number {
         this.enemies.forEach(enemy => enemy.update())
+
+        let nDead = this.enemies.filter(e => e.isDead()).length
         this.enemies = this.enemies.filter(e => !e.shouldDisappear())
 
         if (this.enemies.length < this.MIN_ENEMIES)
@@ -150,5 +162,6 @@ export class EnemyManager
             this.enemies.push(this.newSimpleEnemy(this.context))
         }
 
+        return nDead
     }
 }

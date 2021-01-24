@@ -93,13 +93,14 @@ class TheGame {
         // out of bounds
 
         context.font = "30px Arial"
+        context.fillStyle = 'rgb(0,0,0)'
         context.fillText(`Score: ${this.score}`, 0, 30)
     }
 
     updateAll()
     {
         this.mainChar.update(this.keyController.keyMap)
-        this.enemyManager.updateAll()
+        this.score += this.enemyManager.updateAll()
     }
 
     start(): void
