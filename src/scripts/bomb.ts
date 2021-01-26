@@ -19,15 +19,17 @@ class Bomb extends BaseProjectile
 
     render(context: CanvasRenderingContext2D): HitRegion {
         let fillStyle: string
+        let radius = 5
         if (this.exploded)
         {
-            fillStyle = 'rgb(0,0,0)'
+            fillStyle = 'rgb(219,58,58)'
+            radius = 30
         }
         else
         {
             fillStyle = 'rgb(0,255,0)'
         }
-        return { points: drawCircle(context, this.pos, 5, fillStyle), element: this }
+        return { points: drawCircle(context, this.pos, radius, fillStyle), element: this }
     }
 
     update(): void {
